@@ -4,6 +4,7 @@ import mesh_tensorflow as mtf
 import tensorflow as tf
 
 from .basic import activated_linear_in, activated_linear_out
+from .activation import activate
 from .embedding import embed
 from ..dataclass import BlockArgs
 from ..mtf_wrapper import einsum, greater_equal, multiply, less, exp, reduce_max, reduce_sum
@@ -65,9 +66,10 @@ def attention(args: BlockArgs) -> mtf.Tensor:
         logit += multiply(*_masked_map(args))
     if logit != 0:
         logit += (compare_range(args.params, dim, tmp, less) * 1e38) * -2
-        logit -= mtf.stop_gradient(reduce_max(logit, reduced_dim=tmp))
-        logit = exp(logit)
-        logit /= reduce_sum(logit, reduced_dim=tmp)
+    if 'activate' in args:
+        logit = activate(args(logit))
+    if 'normalized' in args:
+        logit /= reduce_sum(logit, reduced_dim=tmp) + 0.01
     if 'biased_attention_map' in args:
         logit += multiply(*_masked_map(args))
     if 'scale_attention_map' in args:

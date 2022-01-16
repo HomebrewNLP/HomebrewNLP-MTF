@@ -193,7 +193,8 @@ ACTIVATIONS = {'relu': relu,
                'silu': _output0(SiluForward),
                'mish': _output0(MishForward),
                "mtf_mish": mtf_mish,
-               'softsign': _output0(SoftsignForward)
+               'softsign': _output0(SoftsignForward),
+               'exp': mtf.exp
                }
 
 
