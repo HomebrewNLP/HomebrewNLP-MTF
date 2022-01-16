@@ -17,8 +17,8 @@ from .utils_run import CheckpointLoaderHook, add_summary, add_histogram, _import
 from .. import tf_wrapper as tfw
 from ..dataclass import ModelParameter
 from ..mtf_wrapper import reduce_sum
-from ..utils_core import color_print
 from ..optimizer.backend import import_mtf
+from ..utils_core import color_print
 
 tf1 = tf.compat.v1
 Dataset = tf1.data.Dataset
@@ -88,17 +88,18 @@ def computation_func(params: ModelParameter, input_fn: typing.Callable,
 
         if params.train:
             frame_out, token_out, learning_rate, loss, video_loss, \
-            token_loss, accuracy, update_ops, debug_gradients_dict = get_train_model(params)(frame_input,
-                                                                                             cat_mask_src,
-                                                                                             cat_mask_tag,
-                                                                                             token_x_input,
-                                                                                             token_y_input,
-                                                                                             frame_mask_src,
-                                                                                             frame_mask_tag,
-                                                                                             token_mask,
-                                                                                             import_mtf(params,
-                                                                                             manual_global_step,
-                                                                                             "manual_global_step"))
+            token_loss, accuracy, update_ops, debug_gradients_dict = get_train_model(params,
+                                                                                     frame_input,
+                                                                                     cat_mask_src,
+                                                                                     cat_mask_tag,
+                                                                                     token_x_input,
+                                                                                     token_y_input,
+                                                                                     frame_mask_src,
+                                                                                     frame_mask_tag,
+                                                                                     token_mask,
+                                                                                     import_mtf(params,
+                                                                                                manual_global_step,
+                                                                                                "manual_global_step"))
         else:
             token_out, frame_out = get_infrence_model(params)(frame_input,
                                                               cat_mask_src,
