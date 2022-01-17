@@ -66,10 +66,9 @@ def attention(args: BlockArgs) -> mtf.Tensor:
         logit += multiply(*_masked_map(args))
     if logit != 0:
         logit += (compare_range(args.params, dim, tmp, less) * 1e38) * -2
-    if 'activate' in args:
-        logit = activate(args(logit))
-    if 'normalized' in args:
-        logit /= reduce_sum(logit, reduced_dim=tmp) + 0.01
+        logit -= mtf.stop_gradient(reduce_max(logit, reduced_dim=tmp))
+        logit = exp(logit)
+        logit /= reduce_sum(logit, reduced_dim=tmp)
     if 'biased_attention_map' in args:
         logit += multiply(*_masked_map(args))
     if 'scale_attention_map' in args:
