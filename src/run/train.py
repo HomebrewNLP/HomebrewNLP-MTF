@@ -31,7 +31,7 @@ def get_train_model(params: ModelParameter, frame_input, cat_mask_src, cat_mask_
     inputs = list(zip(*map(inp_slice_fn, inputs)))
     idx = constant_scalar(params, 0, dtype=params.optimizer_calculation_dtype)
     all_ops = []
-    total_loss = mtf.zeros(params.mesh, [], params.calculation_dtype)
+    total_loss = mtf.zeros(params.mesh, [], tf.float64)
     for i, args in enumerate(inputs, 1):
         params.is_last_mbatch = i == params.macro_batching
         params.macro_batch_index = i
