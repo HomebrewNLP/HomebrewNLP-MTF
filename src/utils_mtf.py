@@ -96,9 +96,10 @@ def anonymize_dim(dim: DIM, new_size: typing.Optional[int] = None):
 
 
 def unbind(tensor: mtf.Tensor, dim: DIM) -> typing.List[mtf.Tensor]:
-    if isinstance(dim, mtf.Dimension):
-        dim = dim.name
-    return [mtf.reshape(mtf.slice(tensor, i, 1, dim), tensor.shape - dim) for i in range(get_dim(tensor, dim).size)]
+    if not isinstance(dim, mtf.Dimension):
+        dim = get_dim(tensor, dim)
+    return [mtf.reshape(mtf.slice(tensor, i, 1, dim.name), tensor.shape - dim)
+            for i in range(get_dim(tensor, dim).size)]
 
 
 def squeeze(tensor: mtf.Tensor, dims: typing.Union[SHAPE, DIM]):
