@@ -72,9 +72,6 @@ def get_train_model(params: ModelParameter, frame_input, cat_mask_src, cat_mask_
             all_ops.extend([op for op in ops if not isinstance(op, mtf.Assign)])
             graph.operations.clear()
             graph.operations.extend([op for op in ops if isinstance(op, mtf.Variable)])
-
-    return frame_out, token_out, learning_rate, total_loss, first_loss, last_loss, video_loss, token_loss, accuracy,\
+    total_loss /= params.macro_batching
+    return frame_out, token_out, learning_rate, total_loss, first_loss, last_loss, video_loss, token_loss, accuracy, \
            update_ops, {}
-
-
-
