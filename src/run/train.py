@@ -8,7 +8,7 @@ from ..model import build
 from ..mtf_wrapper import constant_scalar, get_variable_for_tensor
 from ..optimizer import get_optimizer
 from ..utils_core import NAME_INDICES
-from ..utils_mtf import unbind, deduplicate
+from ..utils_mtf import unbind, deduplicate, new_dim
 
 
 def none_cast(x: typing.Optional[mtf.Tensor]):
@@ -23,7 +23,8 @@ def get_train_model(params: ModelParameter, frame_input, cat_mask_src, cat_mask_
     def inp_slice_fn(x: typing.Optional[mtf.Tensor]):
         if x is None:
             return [None] * params.macro_batching
-        x = mtf.replace_dimensions(x, params.macro_batch_dim, [slice_dim, params.batch_dim])
+        x = mtf.reshape(x, new_dim(slice_dim, new_size=1) + x.shape.dims)
+        x = mtf.reshape(x, [slice_dim, params.batch_dim] + x.shape.dims[2 :])
         return unbind(x, slice_dim)
 
     inputs = (frame_input, cat_mask_src, cat_mask_tag, token_x_input, token_y_input, frame_mask_src, frame_mask_tag,
