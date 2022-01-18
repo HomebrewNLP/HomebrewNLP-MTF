@@ -87,7 +87,7 @@ def computation_func(params: ModelParameter, input_fn: typing.Callable,
                 end_iterations = reduce_sum(end_iterations, output_shape=[])
 
         if params.train:
-            frame_out, token_out, learning_rate, loss, video_loss, \
+            frame_out, token_out, learning_rate, loss, first_loss, last_loss, video_loss, \
             token_loss, accuracy, update_ops, debug_gradients_dict = get_train_model(params,
                                                                                      frame_input,
                                                                                      cat_mask_src,
@@ -120,7 +120,10 @@ def computation_func(params: ModelParameter, input_fn: typing.Callable,
         color_print(params, f"Lowered in {time.time() - start_time:.1f}s")
 
         if params.train:
-            log_dict = {'learning_rate': tfw.cast(lowering.export_to_tf_tensor(learning_rate), tf.float32)}
+            log_dict = {'learning_rate': tfw.cast(lowering.export_to_tf_tensor(learning_rate), tf.float32),
+                        'first_loss': tfw.cast(lowering.export_to_tf_tensor(first_loss), tf.float32),
+                        'last_loss': tfw.cast(lowering.export_to_tf_tensor(last_loss), tf.float32),
+                        'mean_loss': tfw.cast(lowering.export_to_tf_tensor(loss), tf.float32)}
             if params.use_video:
                 log_dict['video_loss'] = tfw.cast(lowering.export_to_tf_tensor(video_loss), tf.float32)
             if params.use_language:
