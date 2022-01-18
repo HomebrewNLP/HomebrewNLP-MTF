@@ -23,7 +23,7 @@ def get_train_model(params: ModelParameter, frame_input, cat_mask_src, cat_mask_
     def inp_slice_fn(x: typing.Optional[mtf.Tensor]):
         if x is None:
             return [None] * params.macro_batching
-        x = mtf.reshape(x, new_dim(slice_dim, new_size=1) + x.shape.dims)
+        x = mtf.reshape(x, [new_dim(slice_dim, new_size=1)] + x.shape.dims)
         x = mtf.reshape(x, [slice_dim, params.batch_dim] + x.shape.dims[2 :])
         return unbind(x, slice_dim)
 
