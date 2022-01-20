@@ -33,7 +33,7 @@ def linear_warmup(ctx: LearningRateCtx):
 
 def exponential_decay(ctx: LearningRateCtx):
     base = import_float(ctx.config.factor)
-    exp = tfw.maximum(tfw.subtract(ctx.global_steps_float, import_float(ctx.config.start_step), import_float(0)))
+    exp = tfw.maximum(tfw.subtract(ctx.global_steps_float, import_float(ctx.config.start_step)), import_float(0))
     decay = tfw.pow(base, exp)
     ctx.learning_rate = tfw.multiply(ctx.learning_rate, decay)
 
