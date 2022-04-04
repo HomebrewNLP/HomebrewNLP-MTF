@@ -19,12 +19,12 @@ from transformers import GPT2TokenizerFast
 parser = argparse.ArgumentParser()
 parser.add_argument("--name", type=str, default="text",
                     help="Name of output files will be name_i.tfrecords where i is the number of the file")
-parser.add_argument("--procs", type=int, default=2, help="Number of processes in multiprocessing")
-parser.add_argument("--output_dir", type=str, default="gs://jannet/the-bpe-pile/",
+parser.add_argument("--procs", type=int, default=8, help="Number of processes in multiprocessing")
+parser.add_argument("--output_dir", type=str, default="gs://ggpt4/the-big-char-pile/",
                     help="Where to put tfrecords (in a bucket)")
-parser.add_argument("--int64", type=bool, default=True, help="Whether to encode as bytes or int64")
+parser.add_argument("--int64", type=bool, default=False, help="Whether to encode as bytes or int64")
 parser.add_argument("--service_account_json_path", type=str, default="a.json", help="Service account json from gcp")
-parser.add_argument("--buffer_size", type=int, default=2 ** 25, help="This is a minimum size, not a maximum size. "
+parser.add_argument("--buffer_size", type=int, default=2 ** 29, help="This is a minimum size, not a maximum size. "
                                                                      "tfrecords will have this minimum size as well.")
 parser.add_argument("--separator", type=str, default=4,
                     help="separator to place between files in chunk mode."
@@ -42,10 +42,11 @@ def file_generator(args, pid, procs):
         return parse_fn(x.encode()).as_dict()
 
     for i in range(pid, splits, procs):
-        with requests.get(base_url.replace("%s", str(i).zfill(2)), stream=True) as r, open(tmp_name, 'wb') as f:
-            shutil.copyfileobj(r.raw, f)
+        with requests.get(base_url.replace("%s", str(i).zfill(2)), stream=True) as r:
+            tmp = r.raw.read()
+        print(len(tmp))
         with open(tmp_name, 'rb') as f:
-            for item in jsonlines.Reader(io.BufferedReader(zstandard.ZstdDecompressor().stream_reader(f)),
+            for item in jsonlines.Reader(io.BufferedReader(zstandard.ZstdDecompressor().stream_reader(tmp)),
                                          loads=_json_parser):
                 if isinstance(item, dict):
                     item = item['text']
@@ -76,11 +77,10 @@ def create_tfrecords(args, pid, procs):
         tokenized_files.append(f)
         files_processed += 1
 
-        if buffer_size > chunk * args.buffer_size // 4:
+        if buffer_size > chunk * args.buffer_size // 2:
             print(f"Worker: {pid:{len(str(procs))}d} | Buffer: {buffer_size * 2 ** -20:.1f}MB | "
                   f"Files: {files_processed} - TFrecords: {tfrecord_count} | "
-                  f"Wrote: {time.time() - last_write:.0f}s ago - Started: {time.time() - start_time:.0f}s ago",
-                  end='')
+                  f"Wrote: {time.time() - last_write:.0f}s ago - Started: {time.time() - start_time:.0f}s ago")
             chunk += 1
 
         if buffer_size > args.buffer_size:
