@@ -45,15 +45,13 @@ def file_generator(args, pid, procs):
         with requests.get(base_url.replace("%s", str(i).zfill(2)), stream=True) as r:
             tmp = r.raw.read()
         print(len(tmp))
-        with open(tmp_name, 'rb') as f:
-            for item in jsonlines.Reader(io.BufferedReader(zstandard.ZstdDecompressor().stream_reader(tmp)),
-                                         loads=_json_parser):
-                if isinstance(item, dict):
-                    item = item['text']
-                if isinstance(item, list):
-                    item = chr(args.separator).join(item)
-                yield item
-        os.remove(tmp_name)
+        for item in jsonlines.Reader(io.BufferedReader(zstandard.ZstdDecompressor().stream_reader(tmp)),
+                                     loads=_json_parser):
+            if isinstance(item, dict):
+                item = item['text']
+            if isinstance(item, list):
+                item = chr(args.separator).join(item)
+            yield item
 
 
 def create_tfrecords(args, pid, procs):
