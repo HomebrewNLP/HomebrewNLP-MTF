@@ -1,3 +1,6 @@
+Please use [Olmax](https://github.com/HomebrewNLP/Olmax) instead.
+
+
 # OBST
 
 Copyright (c) 2020-2022 Yannic Kilcher (yk), Lucas Nestler (clashluke), Shawn Presser (shawwn), Jan (xmaster96)
