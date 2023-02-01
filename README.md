@@ -1,5 +1,7 @@
 Please use [Olmax](https://github.com/HomebrewNLP/Olmax) instead.
-
+<details>
+<summary>Original Readme</summary>
+<br>
 
 # OBST
 
@@ -20,3 +22,4 @@ We also want to explicitly thank
 * [tensorfork](https://www.tensorfork.com/) and [TRC](https://sites.research.google/trc/) for providing us with the required compute (TPUs)
 * [Ben Wang (kindiana)](https://github.com/kingoflolz) and [Shawn Presser](https://twitter.com/theshawwn) for their invaluable knowledge about TensorFlow, TPU, and language models 
 * [Gwern Branwen](https://www.gwern.net/index), [Tri Songz](https://github.com/trisongz/) and [Aleph Alpha](https://aleph-alpha.de/) for financing our storage and servers
+</details>
